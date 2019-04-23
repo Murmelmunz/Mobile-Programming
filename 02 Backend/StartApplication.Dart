@@ -1,6 +1,7 @@
-import 'DBConnection.dart';
+import 'DBManagement.dart';
 
-void main() {
-  print("test");
-  DBConnection db = new DBConnection();
-}
+  void main() async {
+    DBManagement db = new DBManagement();
+    
+  }
+
