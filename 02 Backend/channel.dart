@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:aqueduct/aqueduct.dart';
+import 'controller/TestController.dart';
 
 
 class FaveReadsChannel extends ApplicationChannel {
@@ -17,6 +18,8 @@ class FaveReadsChannel extends ApplicationChannel {
     router.route("/").linkFunction((request) async {
       return new Response.ok('Hello world')..contentType = ContentType.TEXT;
     });
+
+    router.route("/test/[:id]").link(() => TestController());
 
     return router;
   }
