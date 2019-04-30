@@ -2,12 +2,14 @@ import 'dart:io';
 import 'dart:async';
 import 'package:aqueduct/aqueduct.dart';
 
+
 List test = [
   {'a': 1, 'b': 2, 'c': 3},
   {'a': 4, 'b': 5, 'c': 6},
 ];
 
 class TestController extends ResourceController {
+
   @Operation.get()
   Future<Response> getAll() async {
     return Response.ok(test);

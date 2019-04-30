@@ -4,7 +4,8 @@ import 'package:aqueduct/aqueduct.dart';
 import 'controller/TestController.dart';
 
 
-class FaveReadsChannel extends ApplicationChannel {
+class Channel extends ApplicationChannel {
+  
   @override
   Future prepare() async {
     logger.onRecord.listen(

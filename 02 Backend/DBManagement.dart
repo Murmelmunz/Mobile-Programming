@@ -1,11 +1,21 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 class DBManagement {
-  void createConnection() async {
-    Db db = new Db("mongodb://localhost:27017/test");
+
+  DbCollection coll;
+ 
+  Db db = new Db("mongodb://localhost:27017/test");
+
+  dynamic createConnection() async {
+    
     await db.open();
-    print(db.state);
-    var coll = db.collection('user');
+
+    coll = db.collection('user');
+    
+    /*
+    coll.find().forEach((v) => print(v));
+    */
+
     
     //test with test data
     await coll.insertAll([
@@ -13,10 +23,21 @@ class DBManagement {
       {'login': 'lsmith', 'name': 'Lucy Smith', 'email': 'lucy@smith.com'},
       {'login': 'a', 'name': 'a a', 'email': 'a@a.com'}
     ]);
-    db.close();
+    
+    print(coll);
+    return coll;
+    //db.close();
+  }
+
+  getDB() {
+    return this.db;
+  }
+
+  getColl() {
+    //return this.coll;
   }
 
   DBManagement() {
-    this.createConnection();
+    //this.createConnection();
   }
 }

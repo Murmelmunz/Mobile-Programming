@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:aqueduct/aqueduct.dart';
-import 'channel.dart';
+import 'Channel.dart';
 
 
 class CreateServer {
+
   Future main() async {
-    final app = Application<FaveReadsChannel>()
+    final app = Application<Channel>()
       ..options.configurationFilePath = "config.yaml"
       ..options.port = 3000;
 
