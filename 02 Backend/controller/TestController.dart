@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:aqueduct/aqueduct.dart';
-
+import 'package:mongo_dart/mongo_dart.dart';
 
 List test = [
   {'a': 1, 'b': 2, 'c': 3},
@@ -9,10 +9,22 @@ List test = [
 ];
 
 class TestController extends ResourceController {
+  DbCollection testColl;
+  List testContent = [];
+
+  TestController(coll) {
+    this.testColl = coll;
+  }
 
   @Operation.get()
   Future<Response> getAll() async {
-    return Response.ok(test);
+    await testColl
+        .find()
+        .forEach((v) => {
+          testContent.add(v)
+        });
+
+    return Response.ok(testContent);
   }
 
   @Operation.get('id')
