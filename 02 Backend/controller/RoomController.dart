@@ -34,7 +34,21 @@ class RoomController extends ResourceController {
   Future<Response> create() async {
     Map<String, dynamic> body = request.body.as();
 
-    roomCollection.insert(body);
+    var id;
+
+    await body.forEach((k, v) {
+      if (k.contains('roomId')) {
+        id = v;
+      }
+    });
+
+    var updateContent = await roomCollection.findOne({"roomId": id});
+
+    if (updateContent == null) {
+      roomCollection.insert(body);
+    } else {
+      return Response.conflict(body: 'room with the roomId alresy exists');
+    }
 
     return Response.ok('created new room');
   }
