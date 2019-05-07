@@ -65,7 +65,7 @@ class RoomController extends ResourceController {
 
     var updateContent = await roomCollection.findOne({"roomId": id});
 
-    body.entries.forEach((f) => {updateContent[f.key] = f.value});
+    await body.entries.forEach((f) => {updateContent[f.key] = f.value});
 
     await roomCollection.save(updateContent);
 
