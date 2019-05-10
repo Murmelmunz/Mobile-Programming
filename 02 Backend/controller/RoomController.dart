@@ -5,13 +5,18 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 class RoomController extends ResourceController {
   DbCollection roomCollection;
+  var socket;
 
-  RoomController(roomCollection) {
+  RoomController(roomCollection, socket) {
     this.roomCollection = roomCollection;
+    this.socket = socket;
   }
 
   @Operation.get()
   Future<Response> getAll() async {
+
+    this.socket.add("Hello from RoomController");
+
     List roomCollectionContent = [];
 
     await roomCollection.find().forEach((v) => {roomCollectionContent.add(v)});
