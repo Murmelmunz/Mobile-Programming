@@ -14,8 +14,10 @@ class RoomController extends ResourceController {
 
   @Operation.get()
   Future<Response> getAll() async {
-
-    this.socket.add("Hello from RoomController");
+    
+    if (this.socket != null) {
+      this.socket.add("Hello from RoomController");
+    }
 
     List roomCollectionContent = [];
 
