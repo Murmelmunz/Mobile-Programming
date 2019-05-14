@@ -2,19 +2,21 @@ import 'dart:io';
 import 'dart:async';
 import 'package:aqueduct/aqueduct.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'dart:math';
 
 class RoomController extends ResourceController {
   DbCollection roomCollection;
+  DbCollection counterCollection;
   var socket;
 
-  RoomController(roomCollection, socket) {
+  RoomController(roomCollection, counterCollection, socket) {
     this.roomCollection = roomCollection;
+    this.counterCollection = counterCollection;
     this.socket = socket;
   }
 
   @Operation.get()
   Future<Response> getAll() async {
-    
     if (this.socket != null) {
       this.socket.add("Hello from RoomController");
     }
@@ -37,27 +39,38 @@ class RoomController extends ResourceController {
     return Response.ok(roomIdContent);
   }
 
+  generateId() async {
+    var rng = new Random();
+
+    var id = 0;
+
+    while (id < 1000) {
+      id = id + rng.nextInt(999999);
+    }
+
+    return id;
+  }
+
   @Operation.post()
   Future<Response> create() async {
     Map<String, dynamic> body = request.body.as();
 
-    var id;
+    var id = await generateId();
 
-    await body.forEach((k, v) {
-      if (k.contains('roomId')) {
-        id = v;
-      }
-    });
+    print(id);
 
     var updateContent = await roomCollection.findOne({"roomId": id});
 
-    if (updateContent == null) {
-      roomCollection.insert(body);
-    } else {
-      return Response.conflict(body: 'room with the roomId alresy exists');
+    while (updateContent != null) {
+      id = await generateId();
+      updateContent = await roomCollection.findOne({"roomId": id});
     }
 
-    return Response.ok('created new room');
+    body['roomId'] = id;
+
+    await roomCollection.insert(body);
+
+    return Response.ok(body);
   }
 
   @Operation.put('id')
@@ -76,7 +89,7 @@ class RoomController extends ResourceController {
 
     await roomCollection.save(updateContent);
 
-    return Response.ok("item on pos $id updated");
+    return Response.ok("room with the roomId $id updated");
   }
 
   @Operation.delete('id')

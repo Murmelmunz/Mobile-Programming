@@ -6,10 +6,9 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 class Channel extends ApplicationChannel {
   DbCollection roomCollection;
-
+  DbCollection counterCollection;
+  bool c = false;
   var socket;
-
-  List<WebSocket> websockets = [];
 
   @override
   Future prepare() async {
@@ -26,13 +25,12 @@ class Channel extends ApplicationChannel {
       return new Response.ok('Hello world')..contentType = ContentType.TEXT;
     });
 
-    router.route("/room/[:id]").link(() => RoomController(this.roomCollection, this.socket));
+    router.route("/room/[:id]").link(() => RoomController(
+        this.roomCollection, this.counterCollection, this.socket));
 
     router.route("/connect").linkFunction((request) async {
       socket = await WebSocketTransformer.upgrade(request.raw);
-      socket.listen((a) => {
-        print(a)
-      });
+      socket.listen((a) => {print(a)});
 
       socket.add("data");
 
