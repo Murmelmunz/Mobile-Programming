@@ -1,3 +1,3 @@
-.dart_tool
-.vscode
+.dart_tool/
+.vscode/
 .packages
