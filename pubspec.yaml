@@ -6,3 +6,4 @@ environment:
 dependencies:
   mongo_dart: ^0.3.4
   aqueduct: ^3.0.0
+  password: ^1.0.0

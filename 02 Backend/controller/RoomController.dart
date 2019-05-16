@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:aqueduct/aqueduct.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:math';
+import 'package:password/password.dart';
 
 class RoomController extends ResourceController {
   DbCollection roomCollection;
@@ -57,8 +58,6 @@ class RoomController extends ResourceController {
 
     var id = await generateId();
 
-    print(id);
-
     var updateContent = await roomCollection.findOne({"roomId": id});
 
     while (updateContent != null) {
@@ -67,6 +66,17 @@ class RoomController extends ResourceController {
     }
 
     body['roomId'] = id;
+
+    var password;
+
+    await body.forEach((k, v) {
+      if (k.contains('password')) {
+        password = v;
+      }
+    });
+
+    final hash = Password.hash(password, PBKDF2());
+    body['password'] = hash;
 
     await roomCollection.insert(body);
 
