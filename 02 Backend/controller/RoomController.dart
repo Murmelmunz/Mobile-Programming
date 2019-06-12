@@ -7,12 +7,10 @@ import 'package:password/password.dart';
 
 class RoomController extends ResourceController {
   DbCollection roomCollection;
-  DbCollection counterCollection;
   var socket;
 
-  RoomController(roomCollection, counterCollection, socket) {
+  RoomController(roomCollection, socket) {
     this.roomCollection = roomCollection;
-    this.counterCollection = counterCollection;
     this.socket = socket;
   }
 

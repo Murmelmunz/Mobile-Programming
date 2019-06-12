@@ -1,20 +1,35 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:aqueduct/aqueduct.dart';
+import 'controller/CategoryController.dart';
 import 'controller/RoomController.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class Channel extends ApplicationChannel {
   DbCollection roomCollection;
-  DbCollection counterCollection;
-  bool c = false;
+  DbCollection categoryCollection;
   var socket;
 
   @override
   Future prepare() async {
     Db db = new Db("mongodb://localhost:27017/test");
     await db.open();
-    roomCollection = db.collection('rooms');
+    roomCollection = await db.collection('rooms');
+    categoryCollection = await db.collection('category');
+
+    var collectionEmpty;
+
+    await categoryCollection.count().then((a) {
+      collectionEmpty = a;
+    });
+
+    if (collectionEmpty == 0) {
+      await categoryCollection.insertAll([
+        {'name': "test1"},
+        {'name': "test2"},
+        {'name': "test3"}
+      ]);
+    }
   }
 
   @override
@@ -25,8 +40,12 @@ class Channel extends ApplicationChannel {
       return new Response.ok('Hello world')..contentType = ContentType.TEXT;
     });
 
-    router.route("/room/[:id]").link(() => RoomController(
-        this.roomCollection, this.counterCollection, this.socket));
+    router
+        .route("/room/[:id]")
+        .link(() => RoomController(this.roomCollection, this.socket));
+
+    router.route("room/category/[:name]").link(
+        () => CategoryController(this.categoryCollection, this.roomCollection));
 
     router.route("/connect").linkFunction((request) async {
       socket = await WebSocketTransformer.upgrade(request.raw);
