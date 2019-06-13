@@ -42,7 +42,7 @@ class Channel extends ApplicationChannel {
 
     router
         .route("/room/[:id]")
-        .link(() => RoomController(this.roomCollection, this.socket));
+        .link(() => RoomController(this.roomCollection, this.categoryCollection, this.socket));
 
     router.route("room/category/[:name]").link(
         () => CategoryController(this.categoryCollection, this.roomCollection));

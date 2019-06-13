@@ -27,18 +27,28 @@ class CategoryController extends ResourceController {
   Future<Response> create() async {
     Map<String, dynamic> body = request.body.as();
 
-    await categoryCollection.insert(body);
+    String key;
 
-    return Response.ok(body);
+    await body.forEach((k, v) {
+      key = k;
+    });
+
+    if (body.length == 1 && key.contains('name')) {
+      await categoryCollection.insert(body);
+
+      return Response.ok(body);
+    } else {
+      return Response.forbidden(body: "Only name");
+    }
   }
 
   @Operation.put('name')
   Future<Response> update(@Bind.path('name') String name) async {
-
     var categoryName = await categoryCollection.findOne(where.eq("name", name));
 
     if (categoryName == null) {
-      return Response.notFound(body: 'category with the category name $name not exists');
+      return Response.notFound(
+          body: 'category with the category name $name not exists');
     }
 
     Map<String, dynamic> body = request.body.as();
@@ -57,7 +67,8 @@ class CategoryController extends ResourceController {
     var categoryName = await categoryCollection.findOne(where.eq("name", name));
 
     if (categoryName == null) {
-      return Response.notFound(body: 'category with the category name $name not exists');
+      return Response.notFound(
+          body: 'category with the category name $name not exists');
     }
 
     categoryCollection.remove(where.eq("name", name));
