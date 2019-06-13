@@ -4,15 +4,16 @@ import 'package:aqueduct/aqueduct.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:math';
 import 'package:password/password.dart';
+import 'dart:convert';
 
 class RoomController extends ResourceController {
   DbCollection roomCollection;
-  DbCollection counterCollection;
+  DbCollection categoryCollection;
   var socket;
 
-  RoomController(roomCollection, counterCollection, socket) {
+  RoomController(roomCollection, categoryCollection, socket) {
     this.roomCollection = roomCollection;
-    this.counterCollection = counterCollection;
+    this.categoryCollection = categoryCollection;
     this.socket = socket;
   }
 
@@ -78,9 +79,39 @@ class RoomController extends ResourceController {
     final hash = Password.hash(password, PBKDF2());
     body['password'] = hash;
 
+    Map<String, dynamic> a;
+
+    await body.forEach((k, v) {
+      if (k.contains('categories')) {
+        var t = 0;
+        while (t < v.length) {
+          a = v[t];
+          this.c(a);
+          t++;
+        }
+      }
+    });
+
     await roomCollection.insert(body);
 
     return Response.ok(body);
+  }
+
+  c(a) async {
+    String te;
+
+    await a.forEach((k, v) {
+      te = v;
+      this.helperMethodToCheckIfCategoryExists(te, a);
+    });
+  }
+
+  helperMethodToCheckIfCategoryExists(name, a) async {
+    var test = await categoryCollection.findOne({"name": name});
+
+    if (test == null) {
+      await this.categoryCollection.insert(a);
+    }
   }
 
   @Operation.put('id')
