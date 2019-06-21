@@ -76,8 +76,10 @@ class RoomController extends ResourceController {
       }
     });
 
-    final hash = Password.hash(password, PBKDF2());
-    body['password'] = hash;
+    if (password != null) {
+      final hash = Password.hash(password, PBKDF2());
+      body['password'] = hash;
+    }
 
     Map<String, dynamic> a;
 
