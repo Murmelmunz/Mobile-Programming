@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:aqueduct/aqueduct.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:math';
+import 'dart:core';
 
 class ContributionController extends ResourceController {
   DbCollection roomCollection;
@@ -87,7 +88,6 @@ class ContributionController extends ResourceController {
     Map c = updateContentRoom["user"][n];
     await c.forEach((k, l) {
       if (k == "name") {
-        print(l);
         body["contribution"][0]["name"] = l;
       }
     });
@@ -113,11 +113,59 @@ class ContributionController extends ResourceController {
     return Response.ok(body);
   }
 
-  @Operation.put('id', 'userId', 'state')
-  Future<Response> start(@Bind.path('id') int id,
-      @Bind.path('userId') int userId, @Bind.path('state') String state) async {
-    //Map<String, dynamic> body = request.body.as();
+  @Operation.put('id', 'userId', 'contributionId')
+  Future<Response> start(
+      @Bind.path('id') int id,
+      @Bind.path('userId') int userId,
+      @Bind.path('contributionId') int contributionId) async {
+    Map<String, dynamic> body = request.body.as();
 
-    print(state);
+    Map updateContentRoom = await roomCollection.findOne({"roomId": id});
+
+    int length = updateContentRoom["user"].length;
+    int n = 0;
+    await updateContentRoom.forEach((a, b) async {
+      if (a.contains("user")) {
+        while (n < length) {
+          if (updateContentRoom["user"][n]["userId"] == userId) {
+            break;
+          }
+          n++;
+        }
+      }
+    });
+
+    Map b = updateContentRoom["user"][n]["contribution"];
+    Map c;
+
+    int q = 0;
+    await b.forEach((k, l) async {
+      if (k == "contribution") {
+        while (q < l.length) {
+          if (l[q]["contributionId"] == contributionId) {
+            print(q);
+            c = l[q];
+            break;
+          } else
+            q++;
+        }
+      }
+    });
+
+    await body.addAll(c);
+
+    updateContentRoom["user"][n]["contribution"]["contribution"][0] = body;
+
+    await roomCollection.save(updateContentRoom);
+
+    return Response.ok(body);
+  }
+
+  calculate() async {
+    DateTime before = DateTime.now();
+
+    DateTime after = DateTime.now();
+
+    return before.difference(after).inSeconds;
   }
 }

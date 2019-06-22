@@ -57,7 +57,7 @@ class Channel extends ApplicationChannel {
         .route("room/:id/user/[:userId]")
         .link(() => UserController(this.userCollection, this.roomCollection));
 
-    router.route("room/:id/user/:userId/contribution/[:state]").link(() =>
+    router.route("room/:id/user/:userId/contribution/[:contributionId]").link(() =>
         ContributionController(
             this.roomCollection, this.contributionCollection));
 
