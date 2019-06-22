@@ -15,7 +15,24 @@ class ContributionController extends ResourceController {
 
   @Operation.get('id', 'userId')
   Future<Response> getAll(
-      @Bind.path('id') int id, @Bind.path('userId') int userId) async {}
+      @Bind.path('id') int id, @Bind.path('userId') int userId) async {
+    Map updateContentRoom =
+        await roomCollection.findOne(where.eq("roomId", id));
+
+    int length = updateContentRoom["user"].length;
+    int n = 0;
+    await updateContentRoom.forEach((a, b) async {
+      if (a.contains("user")) {
+        while (n < length) {
+          if (updateContentRoom["user"][n]["userId"] == userId) {
+            break;
+          }
+          n++;
+        }
+      }
+    });
+    return Response.ok(updateContentRoom['user'][n]["contribution"]);
+  }
 
   generateId() async {
     var rng = new Random();
@@ -64,7 +81,7 @@ class ContributionController extends ResourceController {
         }
       }
     });
-    print(n);
+
     Map b = await updateContentRoom["user"][n]["contribution"];
 
     if (b != null) {
