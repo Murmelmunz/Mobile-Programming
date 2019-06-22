@@ -51,18 +51,6 @@ class ContributionController extends ResourceController {
 
     Map updateContentRoom = await roomCollection.findOne({"roomId": id});
     var a = await roomCollection.findOne({"roomId": id});
-    
-    Map b = await updateContentRoom["user"][0]["contribution"];
-
-    await b.forEach((d, e) {
-      if (d == "contribution") {
-        body["contribution"] += e;
-      }
-    });
-    
-    await a.addAll(body);
-    
-    await roomCollection.save(a);
 
     int length = updateContentRoom["user"].length;
     int n = 0;
@@ -70,12 +58,29 @@ class ContributionController extends ResourceController {
       if (a.contains("user")) {
         while (n < length) {
           if (updateContentRoom["user"][n]["userId"] == userId) {
-            updateContentRoom["user"][n]["contribution"] = body;
+            break;
           }
           n++;
         }
       }
     });
+    print(n);
+    Map b = await updateContentRoom["user"][n]["contribution"];
+
+    if (b != null) {
+      await b.forEach((d, e) {
+        if (d == "contribution") {
+          body["contribution"] += e;
+        }
+      });
+
+      await a.addAll(body);
+
+      await roomCollection.save(a);
+    }
+
+    updateContentRoom["user"][n]["contribution"] = body;
+
     await roomCollection.save(updateContentRoom);
 
     return Response.ok(body);
