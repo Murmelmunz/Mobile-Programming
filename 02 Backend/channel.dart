@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:aqueduct/aqueduct.dart';
 import 'controller/CategoryController.dart';
+import 'controller/ContributionController.dart';
 import 'controller/RoomController.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -11,6 +12,7 @@ class Channel extends ApplicationChannel {
   DbCollection roomCollection;
   DbCollection categoryCollection;
   DbCollection userCollection;
+  DbCollection contributionCollection;
   var socket;
 
   @override
@@ -20,6 +22,7 @@ class Channel extends ApplicationChannel {
     roomCollection = await db.collection('rooms');
     categoryCollection = await db.collection('category');
     userCollection = await db.collection('userT');
+    contributionCollection = await db.collection('contribution');
 
     var collectionEmpty;
 
@@ -44,15 +47,19 @@ class Channel extends ApplicationChannel {
       return new Response.ok('Hello world')..contentType = ContentType.TEXT;
     });
 
-    router
-        .route("/room/[:id]")
-        .link(() => RoomController(this.roomCollection, this.categoryCollection, this.socket));
+    router.route("/room/[:id]").link(() => RoomController(
+        this.roomCollection, this.categoryCollection, this.socket));
 
     router.route("room/category/[:name]").link(
         () => CategoryController(this.categoryCollection, this.roomCollection));
 
-     router.route("room/:id/user/[:userId]").link(
-        () => UserController(this.userCollection, this.roomCollection));
+    router
+        .route("room/:id/user/[:userId]")
+        .link(() => UserController(this.userCollection, this.roomCollection));
+
+    router
+        .route("room/:id/user/:userId/contribution")
+        .link(() => ContributionController(this.roomCollection, this.contributionCollection));
 
     router.route("/connect").linkFunction((request) async {
       socket = await WebSocketTransformer.upgrade(request.raw);
