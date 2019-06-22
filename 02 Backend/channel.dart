@@ -57,9 +57,9 @@ class Channel extends ApplicationChannel {
         .route("room/:id/user/[:userId]")
         .link(() => UserController(this.userCollection, this.roomCollection));
 
-    router
-        .route("room/:id/user/:userId/contribution")
-        .link(() => ContributionController(this.roomCollection, this.contributionCollection));
+    router.route("room/:id/user/:userId/contribution/[:state]").link(() =>
+        ContributionController(
+            this.roomCollection, this.contributionCollection));
 
     router.route("/connect").linkFunction((request) async {
       socket = await WebSocketTransformer.upgrade(request.raw);

@@ -63,10 +63,12 @@ class ContributionController extends ResourceController {
     }
 
     body["contribution"][0]['contributionId'] = contributionId;
+    //body["contribution"][0]['name'] = "asdasdasd";
     await contributionCollection.insert({"contributionId": contributionId});
     //
 
     Map updateContentRoom = await roomCollection.findOne({"roomId": id});
+
     var a = await roomCollection.findOne({"roomId": id});
 
     int length = updateContentRoom["user"].length;
@@ -79,6 +81,14 @@ class ContributionController extends ResourceController {
           }
           n++;
         }
+      }
+    });
+
+    Map c = updateContentRoom["user"][n];
+    await c.forEach((k, l) {
+      if (k == "name") {
+        print(l);
+        body["contribution"][0]["name"] = l;
       }
     });
 
@@ -101,5 +111,13 @@ class ContributionController extends ResourceController {
     await roomCollection.save(updateContentRoom);
 
     return Response.ok(body);
+  }
+
+  @Operation.put('id', 'userId', 'state')
+  Future<Response> start(@Bind.path('id') int id,
+      @Bind.path('userId') int userId, @Bind.path('state') String state) async {
+    //Map<String, dynamic> body = request.body.as();
+
+    print(state);
   }
 }
