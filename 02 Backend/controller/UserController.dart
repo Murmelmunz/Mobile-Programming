@@ -36,6 +36,9 @@ class UserController extends ResourceController {
   @Operation.post('id')
   Future<Response> create(@Bind.path('id') int id) async {
     Map<String, dynamic> body = request.body.as();
+    Map<String, dynamic> bodyReturn = request.body.as();
+
+    print(bodyReturn);
 
     var userId = await generateId();
 
@@ -86,13 +89,14 @@ class UserController extends ResourceController {
     if (roomPasswordRoomCollection != null) {
       if (roomPasswordHash == roomPasswordRoomCollection) {
         await roomCollection.save(updateContent);
-        return Response.ok(body);
+        print(bodyReturn);
+        return Response.ok(body["user"][0]);
       } else {
         return Response.unauthorized(body: "false room password");
       }
     } else {
       await roomCollection.save(updateContent);
-      return Response.ok(body);
+      return Response.ok(body["user"][0]);
     }
   }
 
