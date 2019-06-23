@@ -103,7 +103,7 @@ class UserController extends ResourceController {
     Map bodyFromRoom2 =
         await roomCollection.findOne((where.eq("user.userId", userId)));
 
-    if (bodyFromRoom == null || bodyFromRoom2 == null) {
+    if (bodyFromRoom == null) {
       return Response.notFound(body: 'room with the roomId $id not exists');
     }
     if (bodyFromRoom2 == null) {
