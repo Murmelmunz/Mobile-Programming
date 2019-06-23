@@ -135,6 +135,15 @@ class ContributionController extends ResourceController {
       }
     });
 
+    int timeStop = null;
+    int timeStart;
+
+    await body.forEach((a, b) async {
+      if (a == "timeStop") {
+        timeStop = b;
+      }
+    });
+
     Map b = updateContentRoom["user"][n]["contribution"];
     Map c;
 
@@ -143,7 +152,7 @@ class ContributionController extends ResourceController {
       if (k == "contribution") {
         while (q < l.length) {
           if (l[q]["contributionId"] == contributionId) {
-            print(q);
+            timeStart = l[q]["timeStart"];
             c = l[q];
             break;
           } else
@@ -152,6 +161,11 @@ class ContributionController extends ResourceController {
       }
     });
 
+    if (timeStop != null) {
+      int time = timeStop - timeStart;
+      await body.addAll({"time": time});
+    }
+
     await body.addAll(c);
 
     updateContentRoom["user"][n]["contribution"]["contribution"][0] = body;
@@ -159,13 +173,5 @@ class ContributionController extends ResourceController {
     await roomCollection.save(updateContentRoom);
 
     return Response.ok(body);
-  }
-
-  calculate() async {
-    DateTime before = DateTime.now();
-
-    DateTime after = DateTime.now();
-
-    return before.difference(after).inSeconds;
   }
 }
