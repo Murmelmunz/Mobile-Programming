@@ -32,7 +32,8 @@ class ContributionController extends ResourceController {
         }
       }
     });
-    return Response.ok(updateContentRoom['user'][positionFromUser]["contribution"]);
+    return Response.ok(
+        updateContentRoom['user'][positionFromUser]["contribution"]);
   }
 
   generateId() async {
@@ -91,7 +92,8 @@ class ContributionController extends ResourceController {
       }
     });
 
-    Map contentFromContribution = await updateContentRoom["user"][postionFromUser]["contribution"];
+    Map contentFromContribution =
+        await updateContentRoom["user"][postionFromUser]["contribution"];
 
     if (contentFromContribution != null) {
       await contentFromContribution.forEach((d, e) {
@@ -143,7 +145,8 @@ class ContributionController extends ResourceController {
       }
     });
 
-    Map contentFromContribution = updateContentRoom["user"][positionFromUser]["contribution"];
+    Map contentFromContribution =
+        updateContentRoom["user"][positionFromUser]["contribution"];
     Map contentFromContributionInPosition;
 
     int positionContribution = 0;
@@ -167,10 +170,42 @@ class ContributionController extends ResourceController {
 
     await body.addAll(contentFromContributionInPosition);
 
-    updateContentRoom["user"][positionFromUser]["contribution"]["contribution"][0] = body;
+    updateContentRoom["user"][positionFromUser]["contribution"]["contribution"]
+        [0] = body;
 
     await roomCollection.save(updateContentRoom);
 
     return Response.ok(body);
+  }
+
+  @Operation.delete('id', 'userId', 'contributionId')
+  Future<Response> delete(
+      @Bind.path('id') int id,
+      @Bind.path('userId') int userId,
+      @Bind.path('contributionId') int contributionId) async {
+    Map bodyFromRoom = await roomCollection.findOne((where.eq("roomId", id)));
+    Map updateContentRoom = await roomCollection.findOne({"roomId": id});
+
+    int length = updateContentRoom["user"].length;
+    int positionFromUser = 0;
+    await updateContentRoom.forEach((a, b) async {
+      if (a.contains("user")) {
+        while (positionFromUser < length) {
+          if (updateContentRoom["user"][positionFromUser]["userId"] == userId) {
+            break;
+          }
+          positionFromUser++;
+        }
+      }
+    });
+
+    Map a = bodyFromRoom['user'][positionFromUser]['contribution'];
+
+    await a["contribution"].removeWhere(
+        (contribution) => contribution["contributionId"] == contributionId);
+    await bodyFromRoom.addAll(a);
+    await roomCollection.save(bodyFromRoom);
+
+    return Response.ok("contribution with the contributionId  $contributionId removed");
   }
 }
