@@ -29,16 +29,13 @@ class UserController extends ResourceController {
 
   @Operation.get('id')
   Future<Response> getAll(@Bind.path('id') int roomId) async {
-    Map test = await roomCollection.findOne(where.eq("roomId", roomId));
-    return Response.ok(test['user']);
+    Map roomContent = await roomCollection.findOne(where.eq("roomId", roomId));
+    return Response.ok(roomContent['user']);
   }
 
   @Operation.post('id')
   Future<Response> create(@Bind.path('id') int id) async {
     Map<String, dynamic> body = request.body.as();
-    Map<String, dynamic> bodyReturn = request.body.as();
-
-    print(bodyReturn);
 
     var userId = await generateId();
 
@@ -89,7 +86,6 @@ class UserController extends ResourceController {
     if (roomPasswordRoomCollection != null) {
       if (roomPasswordHash == roomPasswordRoomCollection) {
         await roomCollection.save(updateContent);
-        print(bodyReturn);
         return Response.ok(body["user"][0]);
       } else {
         return Response.unauthorized(body: "false room password");
@@ -104,13 +100,13 @@ class UserController extends ResourceController {
   Future<Response> delete(
       @Bind.path('id') int id, @Bind.path('userId') int userId) async {
     Map bodyFromRoom = await roomCollection.findOne((where.eq("roomId", id)));
-    Map bodyFromRoom2 =
+    Map bodyFromRoomUser =
         await roomCollection.findOne((where.eq("user.userId", userId)));
 
     if (bodyFromRoom == null) {
       return Response.notFound(body: 'room with the roomId $id not exists');
     }
-    if (bodyFromRoom2 == null) {
+    if (bodyFromRoomUser == null) {
       return Response.notFound(body: 'user with userId $userId not exists');
     }
 
@@ -118,6 +114,6 @@ class UserController extends ResourceController {
         .removeWhere((value) => value["userId"] == userId);
     await roomCollection.save(bodyFromRoom);
 
-    return Response.ok("user with the user id removed");
+    return Response.ok("user with the userId  $userId removed");
   }
 }

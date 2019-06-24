@@ -32,9 +32,9 @@ class Channel extends ApplicationChannel {
 
     if (collectionEmpty == 0) {
       await categoryCollection.insertAll([
-        {'name': "test1"},
-        {'name': "test2"},
-        {'name': "test3"}
+        {'name': "Geschlecht"},
+        {'name': "Haarfarbe"},
+        {'name': "Nationalität"}
       ]);
     }
   }

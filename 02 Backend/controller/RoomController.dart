@@ -59,11 +59,11 @@ class RoomController extends ResourceController {
 
     var id = await generateId();
 
-    var updateContent = await roomCollection.findOne({"roomId": id});
+    var updateContentRoom = await roomCollection.findOne({"roomId": id});
 
-    while (updateContent != null) {
+    while (updateContentRoom != null) {
       id = await generateId();
-      updateContent = await roomCollection.findOne({"roomId": id});
+      updateContentRoom = await roomCollection.findOne({"roomId": id});
     }
 
     body['roomId'] = id;
@@ -81,14 +81,14 @@ class RoomController extends ResourceController {
       body['password'] = hash;
     }
 
-    Map<String, dynamic> a;
+    Map<String, dynamic> contentFromCategory;
 
     await body.forEach((k, v) {
       if (k.contains('categories')) {
         var t = 0;
         while (t < v.length) {
-          a = v[t];
-          this.c(a);
+          contentFromCategory = v[t];
+          this.getCategoryName(contentFromCategory);
           t++;
         }
       }
@@ -99,20 +99,22 @@ class RoomController extends ResourceController {
     return Response.ok(body);
   }
 
-  c(a) async {
-    String te;
+  getCategoryName(contentFromCategory) async {
+    String categoryName;
 
-    await a.forEach((k, v) {
-      te = v;
-      this.helperMethodToCheckIfCategoryExists(te, a);
+    await contentFromCategory.forEach((k, v) {
+      categoryName = v;
+      this.helperMethodToCheckIfCategoryExists(
+          categoryName, contentFromCategory);
     });
   }
 
-  helperMethodToCheckIfCategoryExists(name, a) async {
-    var test = await categoryCollection.findOne({"name": name});
+  helperMethodToCheckIfCategoryExists(categoryName, contentFromCategory) async {
+    var contentCategory =
+        await categoryCollection.findOne({"name": categoryName});
 
-    if (test == null) {
-      await this.categoryCollection.insert(a);
+    if (contentCategory == null) {
+      await this.categoryCollection.insert(contentFromCategory);
     }
   }
 

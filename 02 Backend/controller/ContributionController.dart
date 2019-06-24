@@ -21,18 +21,18 @@ class ContributionController extends ResourceController {
         await roomCollection.findOne(where.eq("roomId", id));
 
     int length = updateContentRoom["user"].length;
-    int n = 0;
+    int positionFromUser = 0;
     await updateContentRoom.forEach((a, b) async {
       if (a.contains("user")) {
-        while (n < length) {
-          if (updateContentRoom["user"][n]["userId"] == userId) {
+        while (positionFromUser < length) {
+          if (updateContentRoom["user"][positionFromUser]["userId"] == userId) {
             break;
           }
-          n++;
+          positionFromUser++;
         }
       }
     });
-    return Response.ok(updateContentRoom['user'][n]["contribution"]);
+    return Response.ok(updateContentRoom['user'][positionFromUser]["contribution"]);
   }
 
   generateId() async {
@@ -64,49 +64,48 @@ class ContributionController extends ResourceController {
     }
 
     body["contribution"][0]['contributionId'] = contributionId;
-    //body["contribution"][0]['name'] = "asdasdasd";
+
     await contributionCollection.insert({"contributionId": contributionId});
-    //
 
     Map updateContentRoom = await roomCollection.findOne({"roomId": id});
 
-    var a = await roomCollection.findOne({"roomId": id});
+    var contentRoom2 = await roomCollection.findOne({"roomId": id});
 
     int length = updateContentRoom["user"].length;
-    int n = 0;
-    await a.forEach((a, b) async {
+    int postionFromUser = 0;
+    await contentRoom2.forEach((a, b) async {
       if (a.contains("user")) {
-        while (n < length) {
-          if (updateContentRoom["user"][n]["userId"] == userId) {
+        while (postionFromUser < length) {
+          if (updateContentRoom["user"][postionFromUser]["userId"] == userId) {
             break;
           }
-          n++;
+          postionFromUser++;
         }
       }
     });
 
-    Map c = updateContentRoom["user"][n];
-    await c.forEach((k, l) {
+    Map contentFromUser = updateContentRoom["user"][postionFromUser];
+    await contentFromUser.forEach((k, l) {
       if (k == "name") {
         body["contribution"][0]["name"] = l;
       }
     });
 
-    Map b = await updateContentRoom["user"][n]["contribution"];
+    Map contentFromContribution = await updateContentRoom["user"][postionFromUser]["contribution"];
 
-    if (b != null) {
-      await b.forEach((d, e) {
+    if (contentFromContribution != null) {
+      await contentFromContribution.forEach((d, e) {
         if (d == "contribution") {
           body["contribution"] += e;
         }
       });
 
-      await a.addAll(body);
+      await contentRoom2.addAll(body);
 
-      await roomCollection.save(a);
+      await roomCollection.save(contentRoom2);
     }
 
-    updateContentRoom["user"][n]["contribution"] = body;
+    updateContentRoom["user"][postionFromUser]["contribution"] = body;
 
     await roomCollection.save(updateContentRoom);
 
@@ -123,14 +122,14 @@ class ContributionController extends ResourceController {
     Map updateContentRoom = await roomCollection.findOne({"roomId": id});
 
     int length = updateContentRoom["user"].length;
-    int n = 0;
+    int positionFromUser = 0;
     await updateContentRoom.forEach((a, b) async {
       if (a.contains("user")) {
-        while (n < length) {
-          if (updateContentRoom["user"][n]["userId"] == userId) {
+        while (positionFromUser < length) {
+          if (updateContentRoom["user"][positionFromUser]["userId"] == userId) {
             break;
           }
-          n++;
+          positionFromUser++;
         }
       }
     });
@@ -144,19 +143,19 @@ class ContributionController extends ResourceController {
       }
     });
 
-    Map b = updateContentRoom["user"][n]["contribution"];
-    Map c;
+    Map contentFromContribution = updateContentRoom["user"][positionFromUser]["contribution"];
+    Map contentFromContributionInPosition;
 
-    int q = 0;
-    await b.forEach((k, l) async {
+    int positionContribution = 0;
+    await contentFromContribution.forEach((k, l) async {
       if (k == "contribution") {
-        while (q < l.length) {
-          if (l[q]["contributionId"] == contributionId) {
-            timeStart = l[q]["timeStart"];
-            c = l[q];
+        while (positionContribution < l.length) {
+          if (l[positionContribution]["contributionId"] == contributionId) {
+            timeStart = l[positionContribution]["timeStart"];
+            contentFromContributionInPosition = l[positionContribution];
             break;
           } else
-            q++;
+            positionContribution++;
         }
       }
     });
@@ -166,9 +165,9 @@ class ContributionController extends ResourceController {
       await body.addAll({"time": time});
     }
 
-    await body.addAll(c);
+    await body.addAll(contentFromContributionInPosition);
 
-    updateContentRoom["user"][n]["contribution"]["contribution"][0] = body;
+    updateContentRoom["user"][positionFromUser]["contribution"]["contribution"][0] = body;
 
     await roomCollection.save(updateContentRoom);
 

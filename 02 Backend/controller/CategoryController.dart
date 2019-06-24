@@ -27,13 +27,13 @@ class CategoryController extends ResourceController {
   Future<Response> create() async {
     Map<String, dynamic> body = request.body.as();
 
-    String key;
+    String categoryName;
 
     await body.forEach((k, v) {
-      key = k;
+      categoryName = k;
     });
 
-    if (body.length == 1 && key.contains('name')) {
+    if (body.length == 1 && categoryName.contains('name')) {
       await categoryCollection.insert(body);
 
       return Response.ok(body);
@@ -44,29 +44,29 @@ class CategoryController extends ResourceController {
 
   @Operation.put('name')
   Future<Response> update(@Bind.path('name') String name) async {
-    var categoryName = await categoryCollection.findOne(where.eq("name", name));
+    var contentCategory = await categoryCollection.findOne(where.eq("name", name));
 
-    if (categoryName == null) {
+    if (contentCategory == null) {
       return Response.notFound(
           body: 'category with the category name $name not exists');
     }
 
     Map<String, dynamic> body = request.body.as();
 
-    var updateContent = await categoryCollection.findOne({"name": name});
+    var updateContentFromCategory = await categoryCollection.findOne({"name": name});
 
-    await body.entries.forEach((f) => {updateContent[f.key] = f.value});
+    await body.entries.forEach((f) => {updateContentFromCategory[f.key] = f.value});
 
-    await categoryCollection.save(updateContent);
+    await categoryCollection.save(updateContentFromCategory);
 
     return Response.ok("category with the category name $name updated");
   }
 
   @Operation.delete('name')
   Future<Response> delete(@Bind.path('name') String name) async {
-    var categoryName = await categoryCollection.findOne(where.eq("name", name));
+    var contentCategory = await categoryCollection.findOne(where.eq("name", name));
 
-    if (categoryName == null) {
+    if (contentCategory == null) {
       return Response.notFound(
           body: 'category with the category name $name not exists');
     }
