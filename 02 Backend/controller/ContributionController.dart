@@ -111,6 +111,24 @@ class ContributionController extends ResourceController {
 
     await roomCollection.save(updateContentRoom);
 
+    var contentRoomContent = await updateContentRoom["contributionsAll"];
+    
+    if(contentRoomContent != null) {
+      contentRoomContent = await updateContentRoom["contributionsAll"][0];
+    }
+  
+    if (contentRoomContent == null) {
+      var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
+      contentRoomContentTemp["contributionsAll"] = body["contribution"];
+      await roomCollection.save(contentRoomContentTemp);
+    } else {
+      var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
+      var contentRoomContentTemp2 = contentRoomContentTemp["contributionsAll"];
+      contentRoomContentTemp2.add(body["contribution"][0]);
+      contentRoomContentTemp["contributionsAll"] = contentRoomContentTemp2;
+      await roomCollection.save(contentRoomContentTemp);
+    }
+
     return Response.ok(body);
   }
 
@@ -206,6 +224,7 @@ class ContributionController extends ResourceController {
     await bodyFromRoom.addAll(a);
     await roomCollection.save(bodyFromRoom);
 
-    return Response.ok("contribution with the contributionId  $contributionId removed");
+    return Response.ok(
+        "contribution with the contributionId  $contributionId removed");
   }
 }
