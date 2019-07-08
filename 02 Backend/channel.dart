@@ -65,7 +65,7 @@ class Channel extends ApplicationChannel {
             this.roomCollection, this.contributionCollection, this.evaluationCollection));
 
             
-    router.route("evaluation/[:contributionId]").link(() =>
+    router.route("/room/:roomId/evaluation/[:contributionId]").link(() =>
         EvaluationController(this.evaluationCollection));
 
     router.route("/connect").linkFunction((request) async {

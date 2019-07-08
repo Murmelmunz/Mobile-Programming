@@ -12,18 +12,16 @@ class EvaluationController extends ResourceController {
     this.evaluationCollection = evaluationCollection;
   }
 
-  @Operation.get()
-  Future<Response> getAll() async {
-    print("asdasd");
-    var test;
+  @Operation.get('roomId')
+  Future<Response> getAll(@Bind.path ('roomId') int roomId) async {
 
-    List evaluationCollectionContent = await evaluationCollection.find().toList();
+    List evaluationCollectionContent = await evaluationCollection.find({"roomId":roomId}).toList();
 
     return Response.ok(evaluationCollectionContent);
   }
 
-  @Operation.post('contributionId')
-  Future<Response> create(
+  @Operation.post('roomId', 'contributionId')
+  Future<Response> create(@Bind.path ('roomId') int roomId,
       @Bind.path('contributionId') int contributionId) async {
     Map<String, dynamic> body = request.body.as();
 
