@@ -129,6 +129,11 @@ class ContributionController extends ResourceController {
       contentRoomContentTemp["contributionsAll"] = body["contribution"];
       await roomCollection.save(contentRoomContentTemp);
       await evaluationCollection.insert(body["contribution"][0]);
+      var s = updateContentRoom["user"][postionFromUser]["categories"];
+      var l = await evaluationCollection
+          .findOne({"contributionId": contributionId});
+      l['categories'] = s;
+      await evaluationCollection.save(l);
     } else {
       var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
       var contentRoomContentTemp2 = contentRoomContentTemp["contributionsAll"];
@@ -138,7 +143,8 @@ class ContributionController extends ResourceController {
       var s = updateContentRoom["user"][postionFromUser]["categories"];
       print(s);
       await evaluationCollection.insert(body["contribution"][0]);
-      var l = await evaluationCollection.findOne({"contributionId": contributionId});
+      var l = await evaluationCollection
+          .findOne({"contributionId": contributionId});
       l['categories'] = s;
       await evaluationCollection.save(l);
     }
