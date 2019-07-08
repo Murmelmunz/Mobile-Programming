@@ -112,11 +112,12 @@ class ContributionController extends ResourceController {
     await roomCollection.save(updateContentRoom);
 
     var contentRoomContent = await updateContentRoom["contributionsAll"];
-    
-    if(contentRoomContent != null) {
+    //print(contentRoomContent.length);
+
+    if (contentRoomContent != null && contentRoomContent.length != 0) {
       contentRoomContent = await updateContentRoom["contributionsAll"][0];
     }
-  
+
     if (contentRoomContent == null) {
       var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
       contentRoomContentTemp["contributionsAll"] = body["contribution"];
@@ -221,8 +222,16 @@ class ContributionController extends ResourceController {
 
     await a["contribution"].removeWhere(
         (contribution) => contribution["contributionId"] == contributionId);
-    await bodyFromRoom.addAll(a);
+
     await roomCollection.save(bodyFromRoom);
+
+    Map bodyFromRoom2 = await roomCollection.findOne((where.eq("roomId", id)));
+    Map b = bodyFromRoom2;
+
+    await b["contributionsAll"].removeWhere(
+        (contribution) => contribution["contributionId"] == contributionId);
+
+    await roomCollection.save(bodyFromRoom2);
 
     return Response.ok(
         "contribution with the contributionId  $contributionId removed");
