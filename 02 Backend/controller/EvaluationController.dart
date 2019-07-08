@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:aqueduct/aqueduct.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:math';
+import 'dart:convert';
 import 'dart:core';
 
 class EvaluationController extends ResourceController {
@@ -14,11 +14,10 @@ class EvaluationController extends ResourceController {
 
   @Operation.get()
   Future<Response> getAll() async {
-    List evaluationCollectionContent = [];
+    print("asdasd");
+    var test;
 
-    await evaluationCollection
-        .find()
-        .forEach((v) => {evaluationCollectionContent.add(v)});
+    List evaluationCollectionContent = await evaluationCollection.find().toList();
 
     return Response.ok(evaluationCollectionContent);
   }
@@ -33,32 +32,31 @@ class EvaluationController extends ResourceController {
 
     print(updateContentContribution);
 
-    DateTime timeStop = null;
-    DateTime timeStart;
+    String timeStop = null;
+    String timeStart;
 
     await body.forEach((a, b) async {
       if (a == "timeStop") {
-        timeStop = b;
+        timeStop = DateTime.parse(b).toString();
       } else if (a == "timeStart") {
-        timeStart = b;
+        timeStart = DateTime.parse(b).toString();
         updateContentContribution["timeStart"] = timeStart;
         await evaluationCollection.save(updateContentContribution);
       }
     });
 
     await updateContentContribution.forEach((a, b) {
-      if(a == "timeStart") {
+      if (a == "timeStart") {
         timeStart = b;
       }
     });
 
     if (timeStop != null) {
-      int time = timeStop.difference(timeStart).inSeconds;
+      int time = DateTime.parse(timeStop).difference(DateTime.parse(timeStart)).inSeconds;
       updateContentContribution["timeStop"] = timeStop;
       updateContentContribution["time"] = time;
       await evaluationCollection.save(updateContentContribution);
     }
-    
 
     return Response.ok(body);
   }
