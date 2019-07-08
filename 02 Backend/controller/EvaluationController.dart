@@ -33,8 +33,8 @@ class EvaluationController extends ResourceController {
 
     print(updateContentContribution);
 
-    int timeStop = null;
-    int timeStart;
+    DateTime timeStop = null;
+    DateTime timeStart;
 
     await body.forEach((a, b) async {
       if (a == "timeStop") {
@@ -53,7 +53,7 @@ class EvaluationController extends ResourceController {
     });
 
     if (timeStop != null) {
-      int time = timeStop - timeStart;
+      int time = timeStop.difference(timeStart).inSeconds;
       updateContentContribution["timeStop"] = timeStop;
       updateContentContribution["time"] = time;
       await evaluationCollection.save(updateContentContribution);
