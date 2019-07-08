@@ -133,6 +133,7 @@ class ContributionController extends ResourceController {
       var l = await evaluationCollection
           .findOne({"contributionId": contributionId});
       l['categories'] = s;
+      l['roomId'] = id;
       await evaluationCollection.save(l);
     } else {
       var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
