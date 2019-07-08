@@ -8,10 +8,13 @@ import 'dart:core';
 class ContributionController extends ResourceController {
   DbCollection roomCollection;
   DbCollection contributionCollection;
+  DbCollection evaluationCollection;
 
-  ContributionController(roomCollection, contributionCollection) {
+  ContributionController(
+      roomCollection, contributionCollection, evaluationCollection) {
     this.roomCollection = roomCollection;
     this.contributionCollection = contributionCollection;
+    this.evaluationCollection = evaluationCollection;
   }
 
   @Operation.get('id', 'userId')
@@ -90,7 +93,7 @@ class ContributionController extends ResourceController {
       if (k == "name") {
         body["contribution"][0]["name"] = l;
       }
-      if(k=="userId") {
+      if (k == "userId") {
         body["contribution"][0]["userId"] = l;
       }
     });
@@ -125,12 +128,15 @@ class ContributionController extends ResourceController {
       var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
       contentRoomContentTemp["contributionsAll"] = body["contribution"];
       await roomCollection.save(contentRoomContentTemp);
+      await evaluationCollection.insert(body["contribution"][0]);
     } else {
       var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
       var contentRoomContentTemp2 = contentRoomContentTemp["contributionsAll"];
       contentRoomContentTemp2.add(body["contribution"][0]);
       contentRoomContentTemp["contributionsAll"] = contentRoomContentTemp2;
+      print(contentRoomContentTemp["contributionsAll"]);
       await roomCollection.save(contentRoomContentTemp);
+      await evaluationCollection.insert(body["contribution"][0]);
     }
 
     return Response.ok(body);

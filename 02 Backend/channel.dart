@@ -7,12 +7,14 @@ import 'controller/RoomController.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import 'controller/UserController.dart';
+import 'controller/EvaluationController.dart';
 
 class Channel extends ApplicationChannel {
   DbCollection roomCollection;
   DbCollection categoryCollection;
   DbCollection userCollection;
   DbCollection contributionCollection;
+  DbCollection evaluationCollection;
   var socket;
 
   @override
@@ -23,6 +25,7 @@ class Channel extends ApplicationChannel {
     categoryCollection = await db.collection('category');
     userCollection = await db.collection('userT');
     contributionCollection = await db.collection('contribution');
+    evaluationCollection = await db.collection('evaluation');
 
     var collectionEmpty;
 
@@ -59,7 +62,11 @@ class Channel extends ApplicationChannel {
 
     router.route("room/:id/user/:userId/contribution/[:contributionId]").link(() =>
         ContributionController(
-            this.roomCollection, this.contributionCollection));
+            this.roomCollection, this.contributionCollection, this.evaluationCollection));
+
+            
+    router.route("evaluation/[:contributionId]").link(() =>
+        EvaluationController(this.evaluationCollection));
 
     router.route("/connect").linkFunction((request) async {
       socket = await WebSocketTransformer.upgrade(request.raw);
