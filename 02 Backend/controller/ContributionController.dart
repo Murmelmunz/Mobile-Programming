@@ -90,6 +90,9 @@ class ContributionController extends ResourceController {
       if (k == "name") {
         body["contribution"][0]["name"] = l;
       }
+      if(k=="userId") {
+        body["contribution"][0]["userId"] = l;
+      }
     });
 
     Map contentFromContribution =
