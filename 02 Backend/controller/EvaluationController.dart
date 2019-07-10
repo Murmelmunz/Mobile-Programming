@@ -28,8 +28,6 @@ class EvaluationController extends ResourceController {
     Map updateContentContribution =
         await evaluationCollection.findOne({"contributionId": contributionId});
 
-    print(updateContentContribution);
-
     String timeStop = null;
     String timeStart;
 

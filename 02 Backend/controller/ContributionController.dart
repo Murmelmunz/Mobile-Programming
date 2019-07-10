@@ -118,7 +118,6 @@ class ContributionController extends ResourceController {
     await roomCollection.save(updateContentRoom);
 
     var contentRoomContent = await updateContentRoom["contributionsAll"];
-    //print(contentRoomContent.length);
 
     if (contentRoomContent != null && contentRoomContent.length != 0) {
       contentRoomContent = await updateContentRoom["contributionsAll"][0];
@@ -129,90 +128,26 @@ class ContributionController extends ResourceController {
       contentRoomContentTemp["contributionsAll"] = body["contribution"];
       await roomCollection.save(contentRoomContentTemp);
       await evaluationCollection.insert(body["contribution"][0]);
-      var s = updateContentRoom["user"][postionFromUser]["categories"];
-      var l = await evaluationCollection
+      var categoriesFromUser = updateContentRoom["user"][postionFromUser]["categories"];
+      var contentEvaluation = await evaluationCollection
           .findOne({"contributionId": contributionId});
-      l['categories'] = s;
-      l['roomId'] = id;
-      await evaluationCollection.save(l);
+      contentEvaluation['categories'] = categoriesFromUser;
+      contentEvaluation['roomId'] = id;
+      await evaluationCollection.save(contentEvaluation);
     } else {
       var contentRoomContentTemp = await roomCollection.findOne({"roomId": id});
       var contentRoomContentTemp2 = contentRoomContentTemp["contributionsAll"];
       contentRoomContentTemp2.add(body["contribution"][0]);
       contentRoomContentTemp["contributionsAll"] = contentRoomContentTemp2;
       await roomCollection.save(contentRoomContentTemp);
-      var s = updateContentRoom["user"][postionFromUser]["categories"];
+      var categoriesFromUser = updateContentRoom["user"][postionFromUser]["categories"];
       await evaluationCollection.insert(body["contribution"][0]);
-      var l = await evaluationCollection
+      var contentEvaluation = await evaluationCollection
           .findOne({"contributionId": contributionId});
-      l['categories'] = s;
-      l['roomId'] = id;
-      await evaluationCollection.save(l);
+      contentEvaluation['categories'] = categoriesFromUser;
+      contentEvaluation['roomId'] = id;
+      await evaluationCollection.save(contentEvaluation);
     }
-
-    return Response.ok(body);
-  }
-
-  @Operation.put('id', 'userId', 'contributionId')
-  Future<Response> start(
-      @Bind.path('id') int id,
-      @Bind.path('userId') int userId,
-      @Bind.path('contributionId') int contributionId) async {
-    Map<String, dynamic> body = request.body.as();
-
-    Map updateContentRoom = await roomCollection.findOne({"roomId": id});
-
-    int length = updateContentRoom["user"].length;
-    int positionFromUser = 0;
-    await updateContentRoom.forEach((a, b) async {
-      if (a.contains("user")) {
-        while (positionFromUser < length) {
-          if (updateContentRoom["user"][positionFromUser]["userId"] == userId) {
-            break;
-          }
-          positionFromUser++;
-        }
-      }
-    });
-
-    int timeStop = null;
-    int timeStart;
-
-    await body.forEach((a, b) async {
-      if (a == "timeStop") {
-        timeStop = b;
-      }
-    });
-
-    Map contentFromContribution =
-        updateContentRoom["user"][positionFromUser]["contribution"];
-    Map contentFromContributionInPosition;
-
-    int positionContribution = 0;
-    await contentFromContribution.forEach((k, l) async {
-      if (k == "contribution") {
-        while (positionContribution < l.length) {
-          if (l[positionContribution]["contributionId"] == contributionId) {
-            timeStart = l[positionContribution]["timeStart"];
-            contentFromContributionInPosition = l[positionContribution];
-            break;
-          } else
-            positionContribution++;
-        }
-      }
-    });
-
-    if (timeStop != null) {
-      int time = timeStop - timeStart;
-      await body.addAll({"time": time});
-    }
-
-    await body.addAll(contentFromContributionInPosition);
-
-    updateContentRoom["user"][positionFromUser]["contribution"]["contribution"]
-        [0] = body;
-
-    await roomCollection.save(updateContentRoom);
 
     return Response.ok(body);
   }
@@ -238,17 +173,17 @@ class ContributionController extends ResourceController {
       }
     });
 
-    Map a = bodyFromRoom['user'][positionFromUser]['contribution'];
+    Map contributionFromUser = bodyFromRoom['user'][positionFromUser]['contribution'];
 
-    await a["contribution"].removeWhere(
+    await contributionFromUser["contribution"].removeWhere(
         (contribution) => contribution["contributionId"] == contributionId);
 
     await roomCollection.save(bodyFromRoom);
 
     Map bodyFromRoom2 = await roomCollection.findOne((where.eq("roomId", id)));
-    Map b = bodyFromRoom2;
+    Map bodyFromRoom2Temp = bodyFromRoom2;
 
-    await b["contributionsAll"].removeWhere(
+    await bodyFromRoom2Temp["contributionsAll"].removeWhere(
         (contribution) => contribution["contributionId"] == contributionId);
 
     await roomCollection.save(bodyFromRoom2);
